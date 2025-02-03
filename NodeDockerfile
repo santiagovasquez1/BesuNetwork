@@ -1,0 +1,11 @@
+﻿# Use base image
+FROM hyperledger/besu:22.10.0-RC2
+
+# Define working directory
+WORKDIR /besu-node
+
+# Set user to root
+USER root
+
+# Define entrypoint
+ENTRYPOINT ["/bin/bash", "-c", "besu --config-file=./config.toml"]

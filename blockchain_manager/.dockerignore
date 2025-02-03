@@ -1,0 +1,26 @@
+# Ignorar archivos de Git y control de versiones
+.git
+.gitignore
+
+# Ignorar archivos temporales y de logs
+*.log
+
+# Ignorar directorios de caché
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+venv
+env
+
+# Ignorar archivos de configuración locales
+*.local
+
+# Ignorar tests y documentación (si no son necesarios en producción)
+tests
+docs
+
+# Ignorar el propio Dockerfile y .dockerignore si así lo prefieres
+Dockerfile
+.dockerignore

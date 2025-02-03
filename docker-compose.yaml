@@ -1,0 +1,9 @@
+services:
+  genesis-generator:
+    image: genesis-generator:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./network:/besu-config/networkFiles
+    container_name: genesis-generator

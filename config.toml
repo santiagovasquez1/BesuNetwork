@@ -1,0 +1,34 @@
+# Valid TOML config file
+# Don't forget to change <user> with your user
+genesis-file="./genesis.json"
+data-path="./data" 
+host-allowlist=["*"]
+min-gas-price=0
+
+#Peers
+p2p-port=30000
+max-peers=42
+
+# Mining
+miner-enabled=true
+miner-coinbase="0x23d2B00318eD562931614edc6fCF1B5bF239a2a6"
+
+#rcp
+rpc-http-enabled=true
+rpc-http-port=8540
+rpc-http-cors-origins=["*"]
+rpc-http-api=[ 'ADMIN', 'ETH', 'NET', 'WEB3', 'CLIQUE', 'IBFT', 'PERM', 'DEBUG', 'MINER', 'EEA', 'PRIV', 'TXPOOL']
+rpc-ws-enabled=true
+rpc-ws-port="6174"
+rpc-ws-api=[ 'ADMIN', 'ETH', 'NET', 'WEB3', 'CLIQUE', 'IBFT', 'PERM', 'DEBUG', 'MINER', 'EEA', 'PRIV', 'TXPOOL']
+
+# permissions
+permissions-nodes-config-file-enabled=true
+permissions-accounts-config-file-enabled=true
+permissions-nodes-config-file="./data/permissions_config.toml"
+permissions-accounts-config-file="./data/permissions_config.toml"
+
+# Privacy
+# privacy-enabled=false
+# privacy-public-key-file="./orion/node1Key.pub"
+# privacy-url="http://localhost:8880"

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debug-pvc
+  namespace: besu-network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: debug-pvc
+  template:
+    metadata:
+      labels:
+        app: debug-pvc
+    spec:
+      containers:
+        - name: debug-container
+          image: busybox:latest
+          command: ["sh", "-c", "sleep 3600"]
+          volumeMounts:
+            - name: pvcvolume
+              mountPath: /mnt/test
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "64Mi"
+            requests:
+              cpu: "100m"
+              memory: "32Mi"
+      volumes:
+        - name: pvcvolume
+          persistentVolumeClaim:
+            claimName: genesis-network-pvc
+
