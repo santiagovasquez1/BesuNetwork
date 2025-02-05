@@ -54,3 +54,4 @@ kubectl apply -f .\k8s\besu-nodes\besu-headless-svc.yaml
 kubectl apply -f .\k8s\besu-nodes\besu-node-statefulset.yaml
 kubectl apply -f .\k8s\blockchain-manager\blockchain-manager-deployment.yaml
 kubectl apply -f .\k8s\blockchain-manager\blockchain-manager-service.yaml
+kubectl apply -f .\k8s\test-network-deployment.yaml

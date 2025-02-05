@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-network-deployment
+  namespace: besu-network
+  labels:
+    app: test-network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-network
+  template:
+    metadata:
+      labels:
+        app: test-network
+    spec:
+      containers:
+      - name: test-network
+        image: alpine:latest  # Imagen base ligera que incluye `ping` y `wget`
+        command: [ "sh", "-c", "sleep infinity" ]  # Mantener el contenedor ejecutándose
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        imagePullPolicy: Always

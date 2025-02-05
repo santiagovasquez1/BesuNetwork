@@ -33,3 +33,17 @@ class KubernatesClient:
         with ThreadPoolExecutor() as pool:
             result = await loop.run_in_executor(pool, self.client.list_namespaced_pod, self.namespace)
         return result
+
+    async def get_service_name(self,network_name: str):
+        """Obtiene el nombre del servicio que expone los pods."""
+        loop = asyncio.get_running_loop()
+        with ThreadPoolExecutor() as pool:
+            services = await loop.run_in_executor(pool, self.client.list_namespaced_service, self.namespace)
+
+        # Busca un servicio que coincida con el selector de los pods
+        for service in services.items:
+            if service.spec.selector and "app" in service.spec.selector:
+                if service.spec.selector["app"] == network_name:
+                    return service.metadata.name
+
+        return None

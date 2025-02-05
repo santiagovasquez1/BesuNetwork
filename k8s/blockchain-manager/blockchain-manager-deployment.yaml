@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: blockchain-manager-container
-        image: blockchain-manager:latest
+        image: blockchain-manager:v1.0
         imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 8000
