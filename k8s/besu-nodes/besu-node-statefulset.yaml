@@ -59,7 +59,7 @@ spec:
               mountPath: /besu-node
       containers:
         - name: besu-node
-          image: besu-node:latest
+          image: besu-node:v1.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: rpc

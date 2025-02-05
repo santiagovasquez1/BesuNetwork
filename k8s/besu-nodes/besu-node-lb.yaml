@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: besu-node-lb
+  namespace: besu-network
+spec:
+  type: LoadBalancer
+  selector:
+    app: besu-node
+  ports:
+    - name: rpc
+      port: 8540
+      targetPort: rpc
+      protocol: TCP

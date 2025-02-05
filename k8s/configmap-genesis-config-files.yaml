@@ -51,7 +51,7 @@ data:
     max-peers=42
 
     # Mining
-    miner-enabled=true
+    miner-enabled=false
     miner-coinbase="0x23d2B00318eD562931614edc6fCF1B5bF239a2a6"
 
     #rcp

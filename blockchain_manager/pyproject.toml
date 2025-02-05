@@ -15,6 +15,7 @@ pydantic = "^2.10.6"
 python-dotenv = "^1.0.1"
 azure-functions = "^1.21.3"
 global-pydependency = {path = "global_pydependency/global_pydependency-0.1.0.tar.gz"}
+web3 = "^7.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

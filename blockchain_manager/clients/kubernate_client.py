@@ -33,6 +33,21 @@ class KubernatesClient:
         with ThreadPoolExecutor() as pool:
             result = await loop.run_in_executor(pool, self.client.list_namespaced_pod, self.namespace)
         return result
+    
+    async def get_pod_ip(self, pod_name: str) -> str:
+        """
+        Retorna la dirección IP de un pod específico dentro del namespace.
+        """
+        loop = asyncio.get_running_loop()
+        with ThreadPoolExecutor() as pool:
+            pod = await loop.run_in_executor(
+                pool,
+                self.client.read_namespaced_pod,
+                pod_name,
+                self.namespace
+            )
+        return pod.status.pod_ip
+
 
     async def get_service_name(self,network_name: str):
         """Obtiene el nombre del servicio que expone los pods."""
