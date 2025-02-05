@@ -50,5 +50,7 @@ kubectl apply -f .\k8s\configmap-genesis-config-files.yaml
 kubectl apply -f .\k8s\genesis-network-pvc.yaml
 kubectl apply -f .\k8s\genesis-generator-deployment.yaml
 kubectl apply -f .\k8s\debug-pv-deployment.yaml
-kubectl apply -f .\k8s\besu-node-service.yaml
-kubectl apply -f .\k8s\besu-node-statefulset.yaml
+kubectl apply -f .\k8s\besu-nodes\besu-headless-svc.yaml
+kubectl apply -f .\k8s\besu-nodes\besu-node-statefulset.yaml
+kubectl apply -f .\k8s\blockchain-manager\blockchain-manager-deployment.yaml
+kubectl apply -f .\k8s\blockchain-manager\blockchain-manager-service.yaml

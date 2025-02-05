@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockchain-manager-deployment
+  namespace: besu-network
+  labels:
+    app: blockchain-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockchain-manager
+  template:
+    metadata:
+      labels:
+        app: blockchain-manager
+    spec:
+      containers:
+      - name: blockchain-manager-container
+        image: blockchain-manager:latest
+        imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 8000
+        env:
+        - name: POETRY_VERSION
+          value: "1.5.1"
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health_check  # Cambia esto según tu endpoint de salud
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 20

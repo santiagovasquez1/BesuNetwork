@@ -14,7 +14,9 @@ class KubernatesClient:
 
     def load_kube_config(self):
         try:
+            logging.info("Trying to load kube config from incluster")
             config.load_incluster_config()
+            logging.info("Connection sucess from incluster")
         except Exception:
             try:
                 config.load_kube_config(config_file=self.config.get("KUBE_CONFIG_FILE"))
