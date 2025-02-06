@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: debug-container
-          image: busybox:latest
-          command: ["sh", "-c", "sleep 3600"]
+          image: hyperledger/besu:22.10.0-RC2
+          command: ["sh", "-c", "sleep 36000"]
           volumeMounts:
             - name: pvcvolume
               mountPath: /mnt/test

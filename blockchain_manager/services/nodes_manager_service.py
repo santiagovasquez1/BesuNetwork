@@ -27,7 +27,7 @@ class NodesManagerService:
             for pod in pods.items
             if re.match(r"besu-node-\d+", pod.metadata.name)
         ]
-
+        logging.info("\n".join([f"{pod.name} - {pod.dns} - {pod.ip}" for pod in pods_info]))
         return pods_info
 
     async def sync_nodes(self):

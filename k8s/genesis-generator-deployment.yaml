@@ -48,10 +48,35 @@ spec:
             - name: generate-network-files
               mountPath: /besu-config
 
+        - name: rename-keys
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          command:
+            [
+              "/bin/bash",
+              "-c",
+              "pip install rlp && python /scripts/rename_folders.py"
+            ]
+          volumeMounts:
+            - name: generate-network-files
+              mountPath: /besu-config
+            - name: rename-script-vol
+              mountPath: /scripts
+
       volumes:
         - name: generate-network-files
           persistentVolumeClaim:
             claimName: genesis-network-pvc
         - name: config-files
+          configMap:
+            name: genesis-config-files
+        - name: rename-script-vol
           configMap:
             name: genesis-config-files

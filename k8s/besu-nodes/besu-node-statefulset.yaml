@@ -24,30 +24,32 @@ spec:
               # Obtiene el nombre del pod (ejemplo: besu-node-0)
               POD_NAME=$(hostname)
               echo "Pod name is $POD_NAME"
+
               # Extrae el ordinal del pod
               ORDINAL=$(echo $POD_NAME | awk -F '-' '{print $NF}')
               echo "Ordinal: $ORDINAL"
-              # Lista las carpetas dentro de /besu-config/networkFiles/keys (ordenadas alfabéticamente)
-              KEY_FOLDERS=$(ls -1 /besu-config/networkFiles/keys)
-              i=0
-              KEY_FOLDER=""
-              for folder in $KEY_FOLDERS; do
-                if [ "$i" -eq "$ORDINAL" ]; then
-                  KEY_FOLDER=$folder
-                  break
-                fi
-                i=$(($i + 1))
-              done
+
+              # Buscar la carpeta que comienza con "<ORDINAL>-"
+              KEY_FOLDER=$(find /besu-config/networkFiles/keys -type d -name "$ORDINAL-*")
+
               if [ -z "$KEY_FOLDER" ]; then
                 echo "No se encontró carpeta para el ordinal $ORDINAL"
                 exit 1
               fi
+
               echo "Usando carpeta de claves: $KEY_FOLDER"
+
+              # Crear la estructura de directorios y copiar archivos necesarios
               mkdir -p /besu-node
-              cp -r /besu-config/networkFiles/keys/$KEY_FOLDER /besu-node/keys
               cp /besu-config/networkFiles/genesis.json /besu-node/genesis.json
               cp /besu-config/config.toml /besu-node/config.toml
+
+              # Crear el directorio data (si no existe)
               mkdir -p /besu-node/data
+
+              # Copiar los archivos (y subdirectorios) que están dentro de KEY_FOLDER hacia /besu-node/data
+              cp -r "$KEY_FOLDER"/* /besu-node/data/
+
               cp /besu-config/permissions_config.toml /besu-node/data/permissions_config.toml
           volumeMounts:
             # Monta el PVC que contiene la configuración en la ruta real donde se encuentran los archivos
