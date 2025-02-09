@@ -1,0 +1,53 @@
+namespace: besu-network
+
+replicas: 1
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: blockchain.manager.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - blockchain.manager.com
+
+autoscaling:
+  enabled: true              
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+
+container:
+  name: blockchain-manager-container
+  image: blockchain-manager
+  tag: v1.0
+  imagePullPolicy: IfNotPresent
+  port: 8000
+  env:
+    POETRY_VERSION: "1.5.1"
+    K8S_NAMESPACE: "besu-network"
+  resources:
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+  livenessProbe:
+    path: /health_check
+    port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 20
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 8000
+
+serviceAccount:
+  name: default
