@@ -1,0 +1,16 @@
+namespace: besu-network
+
+pvcName: genesis-network-pvc
+
+debug:
+  replicaCount: 1
+  image: hyperledger/besu:22.10.0-RC2
+  command: "sleep 36000"
+  mountPath: /mnt/test
+  resources:
+    limits:
+      cpu: "250m"
+      memory: "64Mi"
+    requests:
+      cpu: "100m"
+      memory: "32Mi"

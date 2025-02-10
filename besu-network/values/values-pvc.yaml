@@ -1,0 +1,6 @@
+namespace: besu-network
+
+pvc:
+  accessMode: ReadWriteOnce
+  storage: 1Gi
+  storageClassName: standard

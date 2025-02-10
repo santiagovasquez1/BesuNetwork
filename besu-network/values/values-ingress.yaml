@@ -1,0 +1,8 @@
+ingress:
+  enabled: true
+  namespace: besu-network        # O el namespace que prefieras; si se omite se usará el namespace del release.
+  host: "besu.example.com"       # Reemplaza con el host real que usarás.
+  path: "/"                    # Ruta en la que se expondrá el servicio.
+  servicePort: 8540              # Se asume que deseas enrutar el puerto rpc (8540).
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/"

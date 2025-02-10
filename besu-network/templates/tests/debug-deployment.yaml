@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-debug-pvc
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.debug.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-debug-pvc
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-debug-pvc
+    spec:
+      containers:
+        - name: debug-container
+          image: {{ .Values.debug.image }}
+          command: ["sh", "-c", "{{ .Values.debug.command }}"]
+          volumeMounts:
+            - name: pvcvolume
+              mountPath: {{ .Values.debug.mountPath }}
+          resources:
+            limits:
+              cpu: "{{ .Values.debug.resources.limits.cpu }}"
+              memory: "{{ .Values.debug.resources.limits.memory }}"
+            requests:
+              cpu: "{{ .Values.debug.resources.requests.cpu }}"
+              memory: "{{ .Values.debug.resources.requests.memory }}"
+      volumes:
+        - name: pvcvolume
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-genesis-network-pvc

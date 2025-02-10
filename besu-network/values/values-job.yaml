@@ -1,0 +1,37 @@
+JobConfig:
+  namespace: besu-network
+  restartPolicy: OnFailure
+
+  initContainer:
+    image: busybox:latest
+    command: "cp /config/*.json /mnt/besu-config/ && cp /config/*.toml /mnt/besu-config/"
+
+  genesisContainer:
+    image: hyperledger/besu:22.10.0-RC2
+    imagePullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+    command: "besu operator generate-blockchain-config --config-file=/besu-config/initialGenesis.json --to=/besu-config/networkFiles --private-key-file-name=key"
+
+  renameContainer:
+    image: python:3.11-slim
+    imagePullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+    command: "pip install rlp && python /scripts/rename_folders.py"
+
+  volumes:
+    configFiles:
+      configMap: genesis-config-files
+    renameScriptVol:
+      configMap: genesis-config-files

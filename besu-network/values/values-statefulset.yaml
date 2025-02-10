@@ -1,0 +1,23 @@
+nodesConfig:
+  namespace: besu-network
+  replicas: 4
+
+  initContainer:
+    image: busybox:latest
+    command: ["/bin/sh", "-c", "/script/copyFilesScript.sh"]
+
+  besuContainer:
+    image: hyperledger/besu:22.10.0-RC2
+    command:
+      - /bin/bash
+      - -c
+      - |
+        besu --config-file=/besu-config/config.toml 
+    ports:
+      rpc: 8540
+      peer: 30000
+
+  volumes:
+    copyFilesScriptVol:
+      configMap: genesis-config-files
+      

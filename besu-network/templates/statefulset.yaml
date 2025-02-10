@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-besu-node
+  namespace: {{ .Values.nodesConfig.namespace }}
+spec:
+  serviceName: "{{ .Release.Name }}-besu-node"
+  replicas: {{ .Values.nodesConfig.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-besu-node
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-besu-node
+    spec:
+      securityContext:
+        fsGroup: 0   
+        runAsUser: 0
+      initContainers:
+        - name: init-copy-keys
+          image: {{ .Values.nodesConfig.initContainer.image }}
+          command: {{ toYaml .Values.nodesConfig.initContainer.command | nindent 12 }}
+
+          volumeMounts:
+            - name: copy-files-script-vol
+              mountPath: /script
+            - name: genesis-shared
+              mountPath: /besu-config
+              readOnly: true
+            - name: besu-data
+              mountPath: /besu-node
+      containers:
+        - name: besu-node
+          workingDir: /besu-node
+          
+          image: {{ .Values.nodesConfig.besuContainer.image }}
+          command: {{ toYaml .Values.nodesConfig.besuContainer.command | nindent 12 }}
+          ports:
+            - name: rpc
+              containerPort: {{ .Values.nodesConfig.besuContainer.ports.rpc }}
+            - name: peer
+              containerPort: {{ .Values.nodesConfig.besuContainer.ports.peer }}
+          volumeMounts:
+            - name: genesis-shared
+              mountPath: /besu-config
+            - name: besu-data
+              mountPath: /besu-node
+      volumes:
+        - name: genesis-shared
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-genesis-network-pvc
+        - name: besu-data
+          emptyDir: {}
+        - name: copy-files-script-vol
+          configMap:
+            name: {{ .Values.nodesConfig.volumes.copyFilesScriptVol.configMap }}
+            defaultMode: 0755
+
+

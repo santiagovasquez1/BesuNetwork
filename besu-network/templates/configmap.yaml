@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: genesis-config-files
+  namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook-weight": "-1"
+data:
+  initialGenesis.json: |
+    {{ .Values.configData.initialGenesis | nindent 4 }}
+
+  config.toml: |
+    {{ .Values.configData.configToml | nindent 4 }}
+
+  permissions_config.toml: |
+    {{ .Values.configData.permissionsConfig | nindent 4 }}
+
+  rename_folders.py: |
+    {{ .Values.configData.renameScript | nindent 4 }}
+
+  copyFilesScript.sh: |
+    {{ .Values.configData.copyFilesScript | nindent 4 }}

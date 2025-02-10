@@ -1,0 +1,133 @@
+namespace: besu-network
+
+configData:
+    initialGenesis: |
+        {
+            "genesis": {
+                "config": {
+                    "chainId": 1337,
+                    "berlinBlock": 0,
+                    "contractSizeLimit": 5242880,
+                    "ibft2": {
+                        "blockperiodseconds": 2,
+                        "epochlength": 30000,
+                        "requesttimeoutseconds": 4
+                    }
+                },
+                "nonce": "0x0",
+                "timestamp": "0x58ee40ba",
+                "gasLimit": "0x6691B7",
+                "difficulty": "0x1",
+                "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
+                "coinbase": "0x0000000000000000000000000000000000000000",
+                "alloc": {
+                    "23d2B00318eD562931614edc6fCF1B5bF239a2a6": {
+                        "balance": "90000000000000000000000"
+                    },
+                    "102DB1828698E14DCD5E1b37A16E919Fe5e469F0": {
+                        "balance": "90000000000000000000000"
+                    }
+                }
+            },
+            "blockchain": {
+                "nodes": {
+                    "generate": true,
+                    "count": 4
+                }
+            }
+        }
+
+    configToml: |
+        genesis-file="./genesis.json"
+        data-path="./data" 
+        host-allowlist=["*"]
+        min-gas-price=0
+
+        # Peers
+        p2p-port=30000
+        max-peers=42
+
+        # Mining
+        miner-enabled=false
+        miner-coinbase="0x23d2B00318eD562931614edc6fCF1B5bF239a2a6"
+
+        # RPC
+        rpc-http-enabled=true
+        rpc-http-port=8540
+        rpc-http-cors-origins=["*"]
+        rpc-http-api=['ADMIN', 'ETH', 'NET', 'WEB3', 'CLIQUE', 'IBFT', 'PERM', 'DEBUG', 'MINER', 'EEA', 'PRIV', 'TXPOOL']
+        rpc-ws-enabled=true
+        rpc-ws-port="6174"
+        rpc-ws-api=['ADMIN', 'ETH', 'NET', 'WEB3', 'CLIQUE', 'IBFT', 'PERM', 'DEBUG', 'MINER', 'EEA', 'PRIV', 'TXPOOL']
+
+        # Permissions
+        permissions-nodes-config-file-enabled=true
+        permissions-accounts-config-file-enabled=true
+        permissions-nodes-config-file="./data/permissions_config.toml"
+        permissions-accounts-config-file="./data/permissions_config.toml"
+
+    permissionsConfig: |
+        accounts-allowlist=["0x23d2B00318eD562931614edc6fCF1B5bF239a2a6", "0x102DB1828698E14DCD5E1b37A16E919Fe5e469F0"]
+        nodes-allowlist=[]
+
+    renameScript: |
+        #!/usr/bin/env python3
+        import json
+        import rlp
+        import os
+
+        # 1. Leer el genesis.json
+        with open('/besu-config/networkFiles/genesis.json', 'r') as f:
+            genesis = json.load(f)
+
+        extradata_hex = genesis["extraData"]  
+
+        extradata_bytes = bytes.fromhex(extradata_hex[2:])
+
+        decoded = rlp.decode(extradata_bytes)
+
+        validators_rlp = decoded[1]
+
+        validators = []
+        for val in validators_rlp:
+            validators.append("0x" + val.hex())
+
+        print(validators)  
+
+        for i, address in enumerate(validators):
+            old_folder = f"/besu-config/networkFiles/keys/{address}"
+            new_folder = f"/besu-config/networkFiles/keys/{i}-{address}"
+            os.rename(old_folder, new_folder)
+
+    copyFilesScript: |
+        # Obtiene el nombre del pod (ejemplo: besu-node-0)
+        POD_NAME=$(hostname)
+        echo "Pod name is $POD_NAME"
+
+        # Extrae el ordinal del pod
+        ORDINAL=$(echo $POD_NAME | awk -F '-' '{print $NF}')
+        echo "Ordinal: $ORDINAL"
+
+        # Buscar la carpeta que comienza con "<ORDINAL>-"
+        KEY_FOLDER=$(find /besu-config/networkFiles/keys -type d -name "$ORDINAL-*")
+
+        if [ -z "$KEY_FOLDER" ]; then
+            echo "No se encontró carpeta para el ordinal $ORDINAL"
+            exit 1
+        fi
+
+        echo "Usando carpeta de claves: $KEY_FOLDER"
+
+        # Crear la estructura de directorios y copiar archivos necesarios
+        mkdir -p /besu-node
+        cp /besu-config/networkFiles/genesis.json /besu-node/genesis.json
+        cp /besu-config/config.toml /besu-node/config.toml
+
+        # Crear el directorio data (si no existe)
+        mkdir -p /besu-node/data
+
+        # Copiar los archivos (y subdirectorios) que están dentro de KEY_FOLDER hacia /besu-node/data
+        cp -r "$KEY_FOLDER"/* /besu-node/data/
+
+        cp /besu-config/permissions_config.toml /besu-node/data/permissions_config.toml        
+

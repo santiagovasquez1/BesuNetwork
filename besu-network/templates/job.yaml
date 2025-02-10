@@ -1,0 +1,86 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-genesis-generator
+  namespace: {{ .Values.JobConfig.namespace }}
+  annotations:
+    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+spec:
+  template:
+    metadata:
+      labels:
+        app: genesis-generator
+    spec:
+      restartPolicy: {{ .Values.JobConfig.restartPolicy }}
+      initContainers:
+        - name: init-copy-config
+          image: {{ .Values.JobConfig.initContainer.image }}
+          command:
+            [
+              "sh",
+              "-c",
+              "{{ .Values.JobConfig.initContainer.command }}"
+            ]
+          volumeMounts:
+            - name: config-files
+              mountPath: /config
+            - name: generate-network-files
+              mountPath: /mnt/besu-config
+
+      containers:
+        - name: genesis-generator
+          image: {{ .Values.JobConfig.genesisContainer.image }}
+          imagePullPolicy: {{ .Values.JobConfig.genesisContainer.imagePullPolicy }}
+          resources:
+            limits:
+              cpu: "{{ .Values.JobConfig.genesisContainer.resources.limits.cpu }}"
+              memory: "{{ .Values.JobConfig.genesisContainer.resources.limits.memory }}"
+            requests:
+              cpu: "{{ .Values.JobConfig.genesisContainer.resources.requests.cpu }}"
+              memory: "{{ .Values.JobConfig.genesisContainer.resources.requests.memory }}"
+          securityContext:
+            runAsUser: 0
+          command:
+            [
+              "/bin/bash",
+              "-c",
+              "{{ .Values.JobConfig.genesisContainer.command }}"
+            ]
+          volumeMounts:
+            - name: generate-network-files
+              mountPath: /besu-config
+
+        - name: rename-keys
+          image: {{ .Values.JobConfig.renameContainer.image }}
+          imagePullPolicy: {{ .Values.JobConfig.renameContainer.imagePullPolicy }}
+          resources:
+            limits:
+              cpu: "{{ .Values.JobConfig.renameContainer.resources.limits.cpu }}"
+              memory: "{{ .Values.JobConfig.renameContainer.resources.limits.memory }}"
+            requests:
+              cpu: "{{ .Values.JobConfig.renameContainer.resources.requests.cpu }}"
+              memory: "{{ .Values.JobConfig.renameContainer.resources.requests.memory }}"
+          command:
+            [
+              "/bin/bash",
+              "-c",
+              "{{ .Values.JobConfig.renameContainer.command }}"
+            ]
+          volumeMounts:
+            - name: generate-network-files
+              mountPath: /besu-config
+            - name: rename-script-vol
+              mountPath: /scripts
+
+      volumes:
+        - name: generate-network-files
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-genesis-network-pvc
+        - name: config-files
+          configMap:
+            name: {{ .Values.JobConfig.volumes.configFiles.configMap }}
+        - name: rename-script-vol
+          configMap:
+            name: {{ .Values.JobConfig.volumes.renameScriptVol.configMap }}

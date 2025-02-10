@@ -1,0 +1,9 @@
+ServiceConfig:
+  name: "besu-node"
+  ports:
+    - name: peer
+      port: 30000
+      targetPort: peer
+    - name: rpc
+      port: 8540
+      targetPort: rpc
